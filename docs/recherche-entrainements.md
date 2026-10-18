@@ -72,6 +72,8 @@ Rotations externes à l'élastique 1 x 15, Y-T-W 1 x 8, fentes latérales 1 x 8 
 
 ### Phase 1 : Reprise (semaines 1 à 6), 2 sorties par semaine
 
+> Non utilisée dans l'app : je cours déjà, l'app démarre directement au cycle « forme » (voir plus bas).
+
 | Semaine | Séance | Durée totale |
 |---------|--------|--------------|
 | 1 | 6–8 x (1 min de course + 2 min de marche) | ~25 min |
@@ -113,6 +115,15 @@ Règles appliquées : pas de séance de jambes lourde la veille du ping ou d'un 
 En phase 1 (semaines 1 à 6), on peut se limiter à : ping x 2, Renfo A x 1, Renfo B x 1, course x 2.
 
 ---
+
+## 4 bis. Version retenue dans l'app (objectif forme)
+
+Je cours déjà, j'ai des élastiques et accès à une salle. Pas d'objectif de course.
+
+- Cycle de 4 semaines qui se répète : semaines 1 à 3 en progression, semaine 4 allégée.
+- Renfo A en salle (poulie pour le woodchop et le Pallof press), Renfo B à la maison avec élastiques.
+- Semaine sans match : lundi footing, mardi ping, mercredi Renfo A, jeudi Renfo B, vendredi ping, samedi course de qualité, dimanche sortie longue optionnelle ou repos.
+- Semaine avec match : le samedi devient repos et mobilité, le dimanche c'est le match.
 
 ## 5. Pour la web app : données à modéliser
 

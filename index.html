@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mon entraînement</title>
+  <meta name="theme-color" content="#0f766e">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Entraînement">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main id="app" aria-live="polite"></main>
+  <nav class="tabbar">
+    <a href="#/semaine" data-tab="semaine"><span aria-hidden="true">📅</span>Semaine</a>
+    <a href="#/exercices" data-tab="exercices"><span aria-hidden="true">💪</span>Exercices</a>
+    <a href="#/historique" data-tab="historique"><span aria-hidden="true">📈</span>Historique</a>
+    <a href="#/reglages" data-tab="reglages"><span aria-hidden="true">⚙️</span>Réglages</a>
+  </nav>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
