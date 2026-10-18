@@ -44,8 +44,8 @@ function cycleWeek(monday) {
 }
 
 function planFor(monday) {
-  const hasMatch = !!store.getState().matchWeeks[monday];
-  return weekPlan(cycleWeek(monday), hasMatch);
+  const { matchWeeks, pingTuesdayWeeks } = store.getState();
+  return weekPlan(cycleWeek(monday), !!matchWeeks[monday], !!pingTuesdayWeeks[monday]);
 }
 
 function sessionAt(date, id) {
@@ -69,6 +69,7 @@ function renderWeek(monday) {
   const plan = planFor(monday);
   const cw = cycleWeek(monday);
   const hasMatch = !!state.matchWeeks[monday];
+  const hasPingTuesday = !!state.pingTuesdayWeeks[monday];
   const t = today();
 
   let planned = 0;
@@ -97,6 +98,10 @@ function renderWeek(monday) {
       <label class="switch">
         <input type="checkbox" id="match-toggle" ${hasMatch ? 'checked' : ''}>
         <span>Match ce dimanche</span>
+      </label>
+      <label class="switch ping">
+        <input type="checkbox" id="ping-tuesday-toggle" ${hasPingTuesday ? 'checked' : ''}>
+        <span>Ping exceptionnel mardi</span>
       </label>
       ${monday !== mondayOf(t) ? `<button class="link" data-nav="${mondayOf(t)}">Revenir à cette semaine</button>` : ''}
     </section>
@@ -131,13 +136,15 @@ function renderWeek(monday) {
 
   $app.querySelectorAll('[data-nav]').forEach((b) =>
     b.addEventListener('click', () => { location.hash = `#/semaine/${b.dataset.nav}`; }));
-  $app.querySelector('#match-toggle').addEventListener('change', (e) => {
+  const bindToggle = (selector, key) => $app.querySelector(selector).addEventListener('change', (e) => {
     store.update((s) => {
-      if (e.target.checked) s.matchWeeks[monday] = true;
-      else delete s.matchWeeks[monday];
+      if (e.target.checked) s[key][monday] = true;
+      else delete s[key][monday];
     });
     renderWeek(monday);
   });
+  bindToggle('#match-toggle', 'matchWeeks');
+  bindToggle('#ping-tuesday-toggle', 'pingTuesdayWeeks');
 }
 
 // ---------- Vue séance ----------

@@ -122,8 +122,10 @@ Je cours déjà, j'ai des élastiques et accès à une salle. Pas d'objectif de 
 
 - Cycle de 4 semaines qui se répète : semaines 1 à 3 en progression, semaine 4 allégée.
 - Renfo A en salle (poulie pour le woodchop et le Pallof press), Renfo B à la maison avec élastiques.
-- Semaine sans match : lundi footing, mardi ping, mercredi Renfo A, jeudi Renfo B, vendredi ping, samedi course de qualité, dimanche sortie longue optionnelle ou repos.
-- Semaine avec match : le samedi devient repos et mobilité, le dimanche c'est le match.
+- En déplacement le lundi et le mardi : ping seulement le vendredi, le mardi est exceptionnel.
+- Semaine sans match : lundi footing (déplacement), mardi Renfo B aux élastiques (déplacement), mercredi Renfo A, jeudi repos ou mobilité, vendredi ping, samedi course de qualité, dimanche sortie longue optionnelle ou repos.
+- Semaine avec match : le jeudi devient un footing, le samedi repos et mobilité, le dimanche c'est le match.
+- Ping exceptionnel le mardi : le Renfo B passe au jeudi.
 
 ## 5. Pour la web app : données à modéliser
 

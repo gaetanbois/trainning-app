@@ -340,25 +340,36 @@ const MOBILITE = {
   ] }],
 };
 
+// Lundi et mardi en déplacement : séances faisables sans salle.
+function away(session) {
+  return {
+    ...session,
+    place: 'En déplacement',
+    intro: `${session.intro} Faisable en déplacement${session.type === 'renfo' ? ' : emporte tes élastiques' : ''}.`,
+  };
+}
+
 // Semaine type. Index 0 = lundi.
-export function weekPlan(cycleWeek, hasMatch) {
+// Ping fixe le vendredi ; le ping du mardi est exceptionnel (option de la semaine).
+export function weekPlan(cycleWeek, hasMatch, pingTuesday = false) {
   const w = cycleWeek;
+  const tuesday = pingTuesday ? PING : away(renfoB(w));
   if (hasMatch) {
     return [
-      [runEasy(w)],
-      [PING],
+      [away(runEasy(w))],
+      [tuesday],
       [renfoA(w)],
-      [renfoB(w)],
+      [pingTuesday ? renfoB(w) : runEasy(w)],
       [PING],
       [MOBILITE],
       [MATCH],
     ];
   }
   return [
-    [runEasy(w)],
-    [PING],
+    [away(runEasy(w))],
+    [tuesday],
     [renfoA(w)],
-    [renfoB(w)],
+    [pingTuesday ? renfoB(w) : MOBILITE],
     [PING],
     [runQuality(w)],
     [runLong(w), MOBILITE],

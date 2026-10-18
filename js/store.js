@@ -5,6 +5,7 @@ const KEY = 'trainning-app:v1';
 const DEFAULT = {
   startDate: null,   // lundi ISO (YYYY-MM-DD) de la semaine 1 du cycle
   matchWeeks: {},    // { '2026-10-19': true }
+  pingTuesdayWeeks: {}, // semaines avec ping exceptionnel le mardi
   logs: {},          // { 'YYYY-MM-DD': { sessionId: { done, rpe, notes, duration, distance, loads: {exId: '20 kg'}, checks: {exId: true} } } }
 };
 

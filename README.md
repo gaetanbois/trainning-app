@@ -2,7 +2,7 @@
 
 Web app (PWA) pour suivre mon programme : tennis de table, renforcement musculaire et running.
 
-- **Semaine** : le programme jour par jour (ping le mardi et le vendredi, bouton « Match ce dimanche » qui adapte la semaine).
+- **Semaine** : le programme jour par jour (ping le vendredi, lundi et mardi en déplacement ; options « Match ce dimanche » et « Ping exceptionnel mardi » qui adaptent la semaine).
 - **Séance** : exercices avec dosage, consignes, charges, ressenti (RPE) et notes.
 - **Exercices** : bibliothèque avec l'intérêt de chaque exercice pour le ping.
 - **Historique** : séances faites et bilan des 4 dernières semaines.
