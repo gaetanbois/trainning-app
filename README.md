@@ -5,6 +5,7 @@ Web app (PWA) pour suivre mon programme : tennis de table, renforcement musculai
 - **Semaine** : le programme jour par jour (ping le vendredi, lundi et mardi en déplacement ; options « Match ce dimanche » et « Ping exceptionnel mardi » qui adaptent la semaine).
 - **Séance** : exercices avec dosage, consignes, charges, ressenti (RPE) et notes.
 - **Exercices** : bibliothèque avec l'intérêt de chaque exercice pour le ping.
+- **Import Santé** : un Raccourci iPhone copie les entraînements de Santé (Apple Watch, et Garmin via Garmin Connect) ; l'app les colle et coche les séances correspondantes (`js/health.js`).
 - **Historique** : séances faites et bilan des 4 dernières semaines.
 
 Cycle de 4 semaines (3 de progression, 1 allégée). Les données restent sur le téléphone (localStorage), avec export et import JSON dans Réglages.

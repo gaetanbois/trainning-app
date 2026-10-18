@@ -1,5 +1,6 @@
 import { EXERCISES, CATEGORIES, CYCLE_LABELS, weekPlan } from './data.js';
 import * as store from './store.js';
+import { parseWorkouts } from './health.js';
 
 const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 const TYPE_LABEL = { renfo: 'Renfo', run: 'Course', ping: 'Ping', match: 'Match', rest: 'Repos' };
@@ -51,7 +52,25 @@ function planFor(monday) {
 function sessionAt(date, id) {
   const monday = mondayOf(date);
   const idx = Math.round((parse(date) - parse(monday)) / 864e5);
-  return planFor(monday)[idx]?.find((s) => s.id === id);
+  return planFor(monday)[idx]?.find((s) => s.id === id) ?? extraSession(date, id);
+}
+
+// Séance importée depuis Santé qui ne correspond à rien dans le programme.
+function extraSession(date, id) {
+  if (!id.startsWith('extra-')) return undefined;
+  const log = store.getLog(date, id);
+  if (!log.type) return undefined;
+  return {
+    id, type: log.type, title: log.title, place: 'Hors programme', duration: log.duration ?? 0,
+    intro: 'Séance importée depuis Santé.', blocks: [],
+  };
+}
+
+function extrasFor(date) {
+  return Object.keys(store.getState().logs[date] ?? {})
+    .filter((id) => id.startsWith('extra-'))
+    .map((id) => extraSession(date, id))
+    .filter(Boolean);
 }
 
 // ---------- Utilitaires ----------
@@ -103,6 +122,7 @@ function renderWeek(monday) {
         <input type="checkbox" id="ping-tuesday-toggle" ${hasPingTuesday ? 'checked' : ''}>
         <span>Ping exceptionnel mardi</span>
       </label>
+      <a class="button health-btn" href="#/import">⌚ Importer depuis Santé</a>
       ${monday !== mondayOf(t) ? `<button class="link" data-nav="${mondayOf(t)}">Revenir à cette semaine</button>` : ''}
     </section>
 
@@ -116,7 +136,7 @@ function renderWeek(monday) {
               <span class="muted">${fmt(date, { day: 'numeric' })}</span>
             </div>
             <div class="day-sessions">
-              ${sessions.map((s) => {
+              ${[...sessions, ...extrasFor(date)].map((s) => {
                 const log = store.getLog(date, s.id);
                 return `
                   <a class="card type-${s.type} ${log.done ? 'done' : ''}" href="#/seance/${date}/${s.id}">
@@ -352,6 +372,95 @@ function renderHistory() {
   `;
 }
 
+// ---------- Import Santé ----------
+
+const EXTRA_TITLE = { run: 'Course', ping: 'Ping', renfo: 'Renfo' };
+
+// Associe chaque entraînement à la séance prévue du même type ce jour-là,
+// sinon l'enregistre comme séance hors programme.
+function applyWorkouts(workouts) {
+  const claimed = new Set();
+  return workouts.map((w) => {
+    const date = iso(w.start);
+    const monday = mondayOf(date);
+    const idx = Math.round((parse(date) - parse(monday)) / 864e5);
+    const accepts = (s) => (w.type === 'ping' ? ['ping', 'match'] : [w.type]).includes(s.type);
+    const planned = planFor(monday)[idx].find((s) => accepts(s) && !claimed.has(`${date}/${s.id}`));
+    const hhmm = `${String(w.start.getHours()).padStart(2, '0')}${String(w.start.getMinutes()).padStart(2, '0')}`;
+    const id = planned ? planned.id : `extra-${w.type}-${hhmm}`;
+    claimed.add(`${date}/${id}`);
+    const patch = { done: true, source: w.label };
+    if (w.minutes) patch.duration = w.minutes;
+    if (w.km) patch.distance = w.km;
+    if (!planned) Object.assign(patch, { type: w.type, title: `${EXTRA_TITLE[w.type]} (${w.label})` });
+    store.setLog(date, id, patch);
+    return { date, id, w, title: planned ? planned.title : patch.title, planned: !!planned };
+  });
+}
+
+function renderImport() {
+  $app.innerHTML = `
+    <header class="session-head">
+      <a class="back" href="#/semaine">‹ Semaine</a>
+      <h1>Importer depuis Santé</h1>
+      <p class="muted">Lance d’abord ton raccourci « Export entraînements », puis reviens ici.</p>
+    </header>
+    <section class="block">
+      <button class="primary" id="paste">Coller et importer</button>
+      <details class="manual">
+        <summary>Coller à la main</summary>
+        <textarea id="raw" rows="5" placeholder="Course à pied ; 2026-10-19T18:30:00+02:00 ; 2026-10-19T19:12:00+02:00 ; 7,4 km"></textarea>
+        <button id="import-raw">Importer ce texte</button>
+      </details>
+      <div id="result"></div>
+    </section>
+    <section class="block help">
+      <h3>Créer le raccourci (une seule fois)</h3>
+      <p>Dans l’app <strong>Raccourcis</strong>, nouveau raccourci nommé « Export entraînements » :</p>
+      <ol class="steps">
+        <li><strong>Rechercher des échantillons de santé</strong> : Type <em>Entraînements</em>, filtre <em>Date de début</em> est dans les <em>7 derniers jours</em>, trier par <em>Date de début</em>, du plus ancien au plus récent.</li>
+        <li><strong>Répéter avec chaque</strong> élément des échantillons de santé.</li>
+        <li>Dans la boucle, action <strong>Texte</strong> avec, en touchant la variable <em>Élément répété</em> pour choisir chaque propriété :<br>
+          <code>Type ; Date de début ; Date de fin ; Distance</code><br>
+          Pour les deux dates, choisis le format <em>ISO 8601</em>. Si <em>Distance</em> n’est pas proposée, laisse-la de côté.</li>
+        <li>Après <em>Fin de la répétition</em> : <strong>Combiner le texte</strong> (Résultats de la répétition, avec <em>Nouvelles lignes</em>).</li>
+        <li><strong>Copier dans le presse-papiers</strong>.</li>
+      </ol>
+      <h3>Garmin Forerunner</h3>
+      <p>Dans <strong>Garmin Connect</strong> : Plus → Paramètres → Apps connectées → <strong>Santé (Apple)</strong>, active l’envoi des activités. Elles arrivent alors dans Santé et le raccourci les récupère. Si la même séance est enregistrée par les deux montres, l’app n’en garde qu’une.</p>
+      <h3>Automatique avec l’Apple Watch</h3>
+      <p>Raccourcis → Automatisation → <em>Entraînement Apple Watch</em> → <em>Se termine</em> → lancer « Export entraînements », sans confirmation. Après la séance, il te reste à ouvrir l’app et toucher « Coller et importer ».</p>
+    </section>
+  `;
+
+  const run = (text) => {
+    const { workouts, skipped } = parseWorkouts(text);
+    const results = applyWorkouts(workouts);
+    $app.querySelector('#result').innerHTML = `
+      <p class="import-sum"><strong>${results.length}</strong> entraînement(s) importé(s)${skipped.length ? `, ${skipped.length} ignoré(s)` : ''}.</p>
+      <ul class="history">${results.map((r) => `
+        <li><a href="#/seance/${r.date}/${r.id}" class="type-${r.w.type}">
+          <span class="muted">${esc(fmt(r.date, { weekday: 'short', day: 'numeric', month: 'short' }))}${r.planned ? '' : ' · hors programme'}</span>
+          <strong>${esc(r.title)}</strong>
+          <span class="muted">${[r.w.minutes && `${r.w.minutes} min`, r.w.km && `${r.w.km} km`].filter(Boolean).join(' · ')}</span>
+        </a></li>`).join('')}</ul>
+      ${skipped.length ? `<details><summary>Lignes ignorées</summary><ul class="skipped">${skipped.map((k) => `<li><em>${esc(k.reason)}</em> : ${esc(k.line)}</li>`).join('')}</ul></details>` : ''}
+    `;
+  };
+
+  $app.querySelector('#paste').addEventListener('click', async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text.trim()) throw new Error('vide');
+      run(text);
+    } catch {
+      $app.querySelector('.manual').open = true;
+      $app.querySelector('#result').innerHTML = '<p class="hint">Presse-papiers inaccessible ou vide : colle le texte dans le champ ci-dessus.</p>';
+    }
+  });
+  $app.querySelector('#import-raw').addEventListener('click', () => run($app.querySelector('#raw').value));
+}
+
 // ---------- Réglages ----------
 
 function renderSettings() {
@@ -420,6 +529,9 @@ function route() {
     case 'historique':
       setActiveTab('historique');
       return renderHistory();
+    case 'import':
+      setActiveTab('semaine');
+      return renderImport();
     case 'reglages':
       setActiveTab('reglages');
       return renderSettings();

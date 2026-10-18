@@ -1,7 +1,7 @@
 // Cache hors ligne : réseau d'abord, cache en secours.
-const CACHE = 'trainning-app-v2';
+const CACHE = 'trainning-app-v3';
 const ASSETS = [
-  './', 'index.html', 'css/styles.css', 'js/app.js', 'js/data.js', 'js/store.js',
+  './', 'index.html', 'css/styles.css', 'js/app.js', 'js/data.js', 'js/store.js', 'js/health.js',
   'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
 ];
 

@@ -371,3 +371,14 @@ li.open .ex-toggle::after { content: " −"; }
 .history em { font-size: .85rem; color: var(--muted); }
 
 .empty { color: var(--muted); text-align: center; padding: 20px 0; }
+
+/* ---------- Import Santé ---------- */
+
+.health-btn { display: block; text-align: center; text-decoration: none; margin-top: 12px; font-weight: 600; }
+.manual { margin: 12px 0; }
+.manual summary, details summary { cursor: pointer; color: var(--accent); }
+.manual button { margin-top: 8px; }
+.import-sum { margin-top: 12px; }
+.help code { display: inline-block; margin: 4px 0; padding: 4px 8px; border-radius: 6px; background: var(--bg); font-size: .85rem; }
+.help h3 { margin-top: 14px; }
+.skipped { font-size: .85rem; color: var(--muted); padding-left: 18px; }
